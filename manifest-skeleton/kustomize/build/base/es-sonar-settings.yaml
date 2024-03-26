@@ -1,0 +1,15 @@
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: es-${{ values.app_name }}-sonar-settings
+spec:
+  secretStoreRef:
+    name: awssm
+    kind: ClusterSecretStore
+  target:
+    name: sonar-settings
+  data:
+  - secretKey: sonar-project.properties
+    remoteRef:
+      key: sonar-project-properties 
+      property: sonar-project.properties

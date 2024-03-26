@@ -1,0 +1,32 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{ values.app_name }}
+  {%- if values.description %}
+  description: ${{ values.description }}
+  {%- endif %}
+  links:
+  - url: https://openshift-gitops-server-openshift-gitops.${{ values.cluster_url }}/applications/openshift-gitops/${{ values.app_name }}-dev
+    title: ArgoCD
+    icon: dashboard
+  - url: https://${{ values.app_name }}-${{ values.app_name }}-develop.${{ values.cluster_url }}
+    title: Application
+    icon: dashboard
+  annotations:
+    argocd/app-name: ${{ values.app_name }}-dev
+    tektonci/build-namespace: ${{ values.app_name }}-develop
+    backstage.io/kubernetes-id: ${{ values.app_name }}
+    backstage.io/kubernetes-namespace: ${{ values.app_name }}-develop
+    janus-idp.io/tekton-enabled : 'true'
+    janus-idp.io/tekton : ${{ values.app_name }}
+    backstage.io/techdocs-ref: url:https://${{ values.git_host_url }}/${{ values.git_owner_name }}/${{ values.app_name }}-app
+    github.com/project-slug: ${{ values.git_owner_name }}/${{ values.app_name }}-app
+    sonarqube.org/project-key: ${{ values.app_name }}
+spec:
+  type: api 
+  system: ${{ values.system | dump }}
+  lifecycle: production
+  owner: ${{ values.owner | dump }}
+  git: ${{ values.git }}
+  git_host_url: ${{ values.git_host_url }}
+  git_owner_name: ${{ values.git_owner_name }}
