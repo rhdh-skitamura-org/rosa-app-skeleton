@@ -24,6 +24,14 @@ jobs:
 
 #    - name: Set up Kubectl
 #      uses: azure/setup-kubectl@v1
+
+    - name: Setup AWS Credentials
+      uses: aws-actions/configure-aws-credentials@master
+      with:
+        role-to-assume: "${{ secrets.AWS_ROLE_ARN }}"
+        aws-region: "${{ vars.AWS_DEFAULT_REGION }}"
+        role-duration-seconds: 3600
+        role-session-name: GitHubActions
       
     - name: Set up OpenShift & ROSA CLI
       run: |
@@ -38,7 +46,7 @@ jobs:
     - name: Get ROSA URL
       run: |
         rosa login --token ${{ secrets.ROSA_TOKEN }}
-        echo "ROSA_URL=https://api.$(rosa describe cluster --region ap-northeast-1 --cluster=${{ vars.ROSA_DEST_CLUSTER_NAME }} | grep DNS | awk '{print $2}')" >> $GITHUB_ENV
+        echo "ROSA_URL=https://api.$(rosa describe cluster --cluster ${{ vars.ROSA_DEST_CLUSTER_NAME }} | grep DNS | awk '{print $2}')" >> $GITHUB_ENV
   
     - name: Update config
       run: |

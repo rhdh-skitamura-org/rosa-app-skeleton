@@ -13,8 +13,8 @@ spec:
     targetRevision: develop
     path: ./kustomize/build/overlays/${{ values.git }}
   destination:
-    #server: https://kubernetes.default.svc
-    server: rosa-destination
+    server: https://kubernetes.default.svc
+    #server: rosa-destination
     namespace: ${{ values.app_name }}-develop
   syncPolicy:
     automated: 
