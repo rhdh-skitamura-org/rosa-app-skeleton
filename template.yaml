@@ -6,6 +6,8 @@ metadata:
   description: Provides the sample code and CI pipeline to build and deploy a sample application on OpenShift. 
   tags:
     - recommended
+    - sample-app
+    - rosa
 spec:
   owner: user:default/skitamura7446
   type: service
@@ -14,17 +16,31 @@ spec:
     - title: Provide information about the new component
       required:
         - app_name
+        - rosa_dest_cluster_name
         - owner
         - system
       properties:
         app_name:
-          title: Repository Name
+          title: Application Name
           type: string
           default: "rosa-sample-app"
         description:
           title: Description
           type: string
           description: Help others understand what this component is for
+        rosa_dest_cluster_name:
+          title: ROSA Cluster Name
+          description: Name of the ROSA Cluster where the application will be deployed
+          type: string
+          ui:field: EntityPicker
+          ui:options:
+            catalogFilter:
+              - kind: Component
+                spec.type: rosa
+            allowedKinds:
+            - Component
+            defaultKind: Component
+            defaultNamespace: default
         owner:
           title: Owner
           type: string
@@ -42,10 +58,10 @@ spec:
             catalogFilter:
               kind:
                 - System
-        cluster_url:
-          title: Cluster URL
-          type: string
-          default: "apps.rosa.sb2366-hcp.qmaa.p3.openshiftapps.com"
+#        cluster_url:
+#          title: Cluster URL
+#          type: string
+#          default: "apps.rosa.sb2366-hcp.qmaa.p3.openshiftapps.com"
         sonarqube_username:
           type: string
           ui:widget: hidden
@@ -125,6 +141,9 @@ spec:
         sourcePath: ./tenant-app
         defaultBranch: develop
         protectDefaultBranch: false
+        repoVariables:
+          APP_NAME: "${{ parameters.app_name }}"
+          ROSA_DEST_CLUSTER_NAME: " ${{ parameters.rosa_dest_cluster_name | parseEntityRef | pick('name') }}"
 
     - id: manifest-template
       name: Generating the K8s Manifest Component
@@ -161,6 +180,9 @@ spec:
         sourcePath: ./tenant-manifest
         defaultBranch: develop
         protectDefaultBranch: false
+        repoVariables:
+          APP_NAME: "${{ parameters.app_name }}"
+          ROSA_DEST_CLUSTER_NAME: " ${{ parameters.rosa_dest_cluster_name | parseEntityRef | pick('name') }}"
 
     - id: register-to-github
       if: ${{ parameters.git == "github" }}
