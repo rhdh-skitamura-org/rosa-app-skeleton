@@ -12,7 +12,9 @@ jobs:
     environment: production
     permissions:
       id-token: write
-      contents: read
+      actions: write
+      checks: write
+      contents: write
     defaults:
       run:
         shell: bash
@@ -63,5 +65,5 @@ jobs:
         git add ./argocd
         git commit -m "Update rosa-destination config" || exit 0
         git fetch
-        git merge origin/main
+        git merge origin/develop
         git push
