@@ -39,22 +39,22 @@ jobs:
         echo "ROSA_URL=https://api.$(rosa describe cluster --cluster=${{ env.ROSA_DEST_CLUSTER_NAME }} | grep DNS | awk '{print $2}')" >> $GITHUB_ENV
   
     - name: Update config
-        run: |
-          python3 -c "
-          print(f'Update ArgoCD Destination')
-          with open('./argo/argocd-app-build.yaml', 'r') as file:
-            filedata = file.read()
-          filedata = filedata.replace('rosa-destination', '${{ env.ROSA_URL }}')
-          with open('./argo/argocd-app-build.yaml', 'w') as file:
-            file.write(filedata)
-          
-          print(f'Update ArgoCD Destination')
-          with open('./argo/argocd-app-dev.yaml', 'r') as file:
-            filedata = file.read()
-          filedata = filedata.replace('rosa-destination', '${{ env.ROSA_URL }}')
-          with open('./argo/argocd-app-dev.yaml', 'w') as file:
-            file.write(filedata)
-          "
+      run: |
+        python3 -c "
+        print(f'Update ArgoCD Destination')
+        with open('./argo/argocd-app-build.yaml', 'r') as file:
+          filedata = file.read()
+        filedata = filedata.replace('rosa-destination', '${{ env.ROSA_URL }}')
+        with open('./argo/argocd-app-build.yaml', 'w') as file:
+          file.write(filedata)
+        
+        print(f'Update ArgoCD Destination')
+        with open('./argo/argocd-app-dev.yaml', 'r') as file:
+          filedata = file.read()
+        filedata = filedata.replace('rosa-destination', '${{ env.ROSA_URL }}')
+        with open('./argo/argocd-app-dev.yaml', 'w') as file:
+          file.write(filedata)
+        "
 
     - name: Commit and push if changed
       run: |
