@@ -1,0 +1,67 @@
+name: 'Update ArgoCD Destination'
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  argocd-setting:
+    name: 'argocd-setting'
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      id-token: write
+      contents: read
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+#    - name: Set up Kubectl
+#      uses: azure/setup-kubectl@v1
+      
+    - name: Set up OpenShift & ROSA CLI
+      run: |
+        curl -LO https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz
+        tar xvzf openshift-client-linux.tar.gz -C /usr/local/bin
+        chmod +x /usr/local/bin/oc
+        chmod +x /usr/local/bin/kubectl
+        curl -LO https://mirror.openshift.com/pub/openshift-v4/clients/rosa/latest/rosa-linux.tar.gz
+        tar xvf rosa-linux.tar.gz
+        mv rosa /usr/local/bin/rosa
+
+    - name: Get ROSA URL
+      run: |
+        rosa login --token ${{ secrets.ROSA_TOKEN }}
+        echo "ROSA_URL=https://api.$(rosa describe cluster --cluster=$(params.rosa-cluster-name) | grep DNS | awk '{print $2}')" >> $GITHUB_ENV
+  
+    - name: Update config
+        run: |
+          python3 -c "
+          print(f'Update ArgoCD Destination')
+          with open('./argo/argocd-app-build.yaml', 'r') as file:
+            filedata = file.read()
+          filedata = filedata.replace('rosa-destination', '${{ env.ROSA_URL }}')
+          with open('./argo/argocd-app-build.yaml', 'w') as file:
+            file.write(filedata)
+          
+          print(f'Update ArgoCD Destination')
+          with open('./argo/argocd-app-dev.yaml', 'r') as file:
+            filedata = file.read()
+          filedata = filedata.replace('rosa-destination', '${{ env.ROSA_URL }}')
+          with open('./argo/argocd-app-dev.yaml', 'w') as file:
+            file.write(filedata)
+          "
+
+    - name: Commit and push if changed
+      run: |
+        git config user.email "action@github.com"
+        git config user.name "actions-user"
+        git add ./argocd
+        git commit -m "Update rosa-destination config" || exit 0
+        git fetch
+        git merge origin/main
+        git push
