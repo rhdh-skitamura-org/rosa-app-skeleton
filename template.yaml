@@ -7,7 +7,6 @@ metadata:
   tags:
     - recommended
     - sample-app
-    - rosa
 spec:
   owner: user:default/skitamura7446
   type: service

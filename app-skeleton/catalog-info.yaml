@@ -12,6 +12,9 @@ metadata:
   - url: https://${{ values.app_name }}-${{ values.app_name }}-develop.${{ values.cluster_url }}
     title: Application
     icon: dashboard
+  - url: https://${{ values.git_host_url }}/${{ values.git_owner_name }}/${{ values.app_name }}-manifest 
+    title: Manifest Repo
+    icon: github
   annotations:
     argocd/app-name: ${{ values.app_name }}-dev
     tektonci/build-namespace: ${{ values.app_name }}-develop
