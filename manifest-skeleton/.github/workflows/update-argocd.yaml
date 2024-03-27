@@ -42,14 +42,14 @@ jobs:
       run: |
         python3 -c "
         print(f'Update ArgoCD Destination')
-        with open('./argo/argocd-app-build.yaml', 'r') as file:
+        with open('./argocd/argocd-app-build.yaml', 'r') as file:
           filedata = file.read()
         filedata = filedata.replace('rosa-destination', '${{ env.ROSA_URL }}')
         with open('./argocd/argocd-app-build.yaml', 'w') as file:
           file.write(filedata)
         
         print(f'Update ArgoCD Destination')
-        with open('./argo/argocd-app-dev.yaml', 'r') as file:
+        with open('./argocd/argocd-app-dev.yaml', 'r') as file:
           filedata = file.read()
         filedata = filedata.replace('rosa-destination', '${{ env.ROSA_URL }}')
         with open('./argocd/argocd-app-dev.yaml', 'w') as file:
